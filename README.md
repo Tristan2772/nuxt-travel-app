@@ -2,6 +2,8 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
+Built with CJ's tutorial video (https://youtu.be/DK93dqmJJYg?si=VkpbWr3odmOJbnpB)
+
 ## Setup
 
 Make sure to install dependencies:
