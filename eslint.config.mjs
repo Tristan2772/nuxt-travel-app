@@ -14,8 +14,10 @@ export default withNuxt(antfu({
     semi: true,
     quotes: "double",
   },
+  ignores: ["**/migrations/*"],
 }, {
   rules: {
+    "ts/no-redeclare": "off",
     "ts/consistent-type-definitions": ["error", "type"],
     "no-console": ["warn"],
     "antfu/no-top-level-await": ["off"],
