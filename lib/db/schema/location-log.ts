@@ -1,5 +1,6 @@
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+import { user } from "./auth";
 import { location } from "./location";
 
 export const locationLog = sqliteTable("locationLog", {
@@ -10,6 +11,7 @@ export const locationLog = sqliteTable("locationLog", {
   description: text(),
   lat: real().notNull(),
   long: real().notNull(),
+  userId: integer().notNull().references(() => user.id),
   locationId: integer().notNull().references(() => location.id),
   createdAt: integer().notNull().$default(() => Date.now()),
   updatedAt: integer().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
