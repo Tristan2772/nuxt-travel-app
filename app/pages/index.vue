@@ -8,9 +8,7 @@
         <p class="py-6">
           Keep track of your travels and the memories they hold with this simple travel log. Add locations, photos, and notes to create a journal of your travel memories.
         </p>
-        <button class="btn btn-accent">
-          Sign In <Icon name="tabler:brand-github" />
-        </button>
+        <AppAuthButton />
       </div>
     </div>
   </div>
