@@ -1,8 +1,9 @@
 import db from "~~/lib/db";
-import { InsertLocation } from "~~/lib/db/schema";
-import { location } from "~~/lib/db/schema/location";
+import { InsertLocation, location } from "~~/lib/db/schema";
+// import { location } from "~~/lib/db/schema/location";
 
 export default defineEventHandler(async (event) => {
+  // if no user, then return with error
   if (!event.context.user) {
     return sendError(event, createError ({
       statusCode: 401,
@@ -10,8 +11,8 @@ export default defineEventHandler(async (event) => {
     }));
   }
 
+  // validate the form inputs
   const result = await readValidatedBody(event, InsertLocation.safeParse);
-
   if (!result.success) {
     const statusMessage = result.error.issues.map(issue => `${issue.path.join("")}: ${issue.message}`).join("; ");
 
@@ -27,11 +28,12 @@ export default defineEventHandler(async (event) => {
     }));
   }
 
-  db.insert(location).values({
+  // insert and return with validated data
+  const [created] = await db.insert(location).values({
     ...result.data,
     slug: result.data.name.replaceAll(" ", "-").toLowerCase(),
-    userId: 1,
-  });
+    userId: event.context.user.id,
+  }).returning();
 
-  return result.data;
+  return created;
 });

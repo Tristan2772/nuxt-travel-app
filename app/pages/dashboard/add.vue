@@ -4,9 +4,12 @@ import type { FetchError } from "ofetch";
 import { toTypedSchema } from "@vee-validate/zod";
 import { InsertLocation } from "~~/lib/db/schema";
 
+const { $csrfFetch } = useNuxtApp();
+
 const loading = ref(false);
 const router = useRouter();
 const submitError = ref("");
+const submitted = ref(false);
 
 const { handleSubmit, errors, meta, setErrors } = useForm({
   validationSchema: toTypedSchema(InsertLocation),
@@ -17,12 +20,12 @@ const onSubmit = handleSubmit(async (values) => {
     submitError.value = "";
     loading.value = true;
 
-    const inserted = await $fetch("/api/locations", {
+    await $csrfFetch("/api/locations", {
       method: "post",
       body: values,
     });
-    // eslint-disable-next-line no-console
-    console.log(inserted);
+    submitted.value = true;
+    navigateTo("/dashboard");
   }
   catch (e) {
     const error = e as FetchError;
