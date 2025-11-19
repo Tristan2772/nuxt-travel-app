@@ -32,13 +32,13 @@ const onSubmit = handleSubmit(async (values) => {
     if (error.data?.data) {
       setErrors(error.data?.data);
     }
-    submitError.value = error.statusMessage || "An unknown error occurred.";
+    submitError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred.";
   }
   loading.value = false;
 });
 
 onBeforeRouteLeave(() => {
-  if (meta.value.dirty) {
+  if (!submitted.value && meta.value.dirty) {
     // eslint-disable-next-line no-alert
     const confirm = window.confirm("Are you sure you want to leave? All unsaved changes will not be saved.");
     if (!confirm) {

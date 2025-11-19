@@ -1,12 +1,8 @@
 import type { DrizzleError } from "drizzle-orm";
 
-import db from "~~/lib/db";
-import { InsertLocation, location } from "~~/lib/db/schema";
-import { and, eq } from "drizzle-orm";
-import { customAlphabet } from "nanoid";
+import { findLocationByName, findUniqueSlug, insertLocation } from "~~/lib/db/queries/location";
+import { InsertLocation } from "~~/lib/db/schema";
 import slugify from "slug";
-
-const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
 
 export default defineEventHandler(async (event) => {
   // if no user, then return with error
@@ -34,14 +30,8 @@ export default defineEventHandler(async (event) => {
     }));
   }
 
-  const existingLocation = await db.query.location.findFirst({
-    where:
-    and(
-      eq(location.name, result.data.name),
-      eq(location.userId, event.context.user.id),
-
-    ),
-  });
+  // make sure location name is available
+  const existingLocation = await findLocationByName(result.data, event.context.user.id);
   if (existingLocation) {
     return sendError(event, createError ({
       statusCode: 409,
@@ -50,30 +40,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // create a unique slug
-  let slug = slugify(result.data.name);
-  let existingSlug = !!(await db.query.location.findFirst({
-    where: eq(location.slug, slug),
-  }));
-
-  while (existingSlug) {
-    const id = nanoid();
-    const newSlug = `${slug}-${id}`;
-    existingSlug = !!(await db.query.location.findFirst({
-      where: eq(location.slug, newSlug),
-    }));
-    if (!existingSlug) {
-      slug = newSlug;
-    }
-  }
+  const slug = await findUniqueSlug(slugify(result.data.name));
 
   // insert and return with validated data
   try {
-    const [created] = await db.insert(location).values({
-      ...result.data,
-      slug: slugify(result.data.name),
-      userId: event.context.user.id,
-    }).returning();
-    return created;
+    return insertLocation(result.data, slug, event.context.user.id);
   }
   catch (e) {
     const error = e as DrizzleError;
