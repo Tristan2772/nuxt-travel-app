@@ -1,18 +1,11 @@
 import type { DrizzleError } from "drizzle-orm";
 
+import defineAuthenticatedEventHandler from "~~/app/utils/define-authenticated-event-handler";
 import { findLocationByName, findUniqueSlug, insertLocation } from "~~/lib/db/queries/location";
 import { InsertLocation } from "~~/lib/db/schema";
 import slugify from "slug";
 
-export default defineEventHandler(async (event) => {
-  // if no user, then return with error
-  if (!event.context.user) {
-    return sendError(event, createError ({
-      statusCode: 401,
-      statusMessage: "Unauthorized Access",
-    }));
-  }
-
+export default defineAuthenticatedEventHandler(async (event) => {
   // validate the form inputs
   const result = await readValidatedBody(event, InsertLocation.safeParse);
   if (!result.success) {
