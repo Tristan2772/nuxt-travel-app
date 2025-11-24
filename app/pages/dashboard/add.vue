@@ -2,17 +2,49 @@
 import type { FetchError } from "ofetch";
 
 import { toTypedSchema } from "@vee-validate/zod";
+import { CENTER_USA } from "~~/lib/constants";
 import { InsertLocation } from "~~/lib/db/schema";
 
 const { $csrfFetch } = useNuxtApp();
+
+const mapStore = useMapStore();
 
 const loading = ref(false);
 const router = useRouter();
 const submitError = ref("");
 const submitted = ref(false);
-
-const { handleSubmit, errors, meta, setErrors } = useForm({
+const { handleSubmit, errors, meta, setErrors, setFieldValue, controlledValues } = useForm({
   validationSchema: toTypedSchema(InsertLocation),
+  initialValues: {
+    name: "",
+    description: "",
+    long: (CENTER_USA as [number, number])[0],
+    lat: (CENTER_USA as [number, number])[1],
+  },
+});
+
+function formatNumber(value?: number) {
+  if (!value) {
+    return 0;
+  }
+  return value.toFixed(5);
+}
+
+effect(() => {
+  if (mapStore.newPoint) {
+    setFieldValue("long", mapStore.newPoint.long);
+    setFieldValue("lat", mapStore.newPoint.lat);
+  }
+});
+
+onMounted(() => {
+  mapStore.newPoint = {
+    id: 1,
+    name: "New Point",
+    description: "",
+    long: (CENTER_USA as [number, number])[0],
+    lat: (CENTER_USA as [number, number])[1],
+  };
 });
 
 const onSubmit = handleSubmit(async (values) => {
@@ -45,12 +77,13 @@ onBeforeRouteLeave(() => {
       return false;
     }
   }
+  mapStore.newPoint = null;
   return true;
 });
 </script>
 
 <template>
-  <div class="container max-w-md mx-auto ">
+  <div class="container max-w-md mx-auto p-4 ">
     <div class="my-6 text-center">
       <h1 class="text-lg">
         Add Location
@@ -92,22 +125,11 @@ onBeforeRouteLeave(() => {
         :error="errors.description"
         :disabled="loading"
       />
-      <AppFormInput
-        label="Latitude: "
-        name="lat"
-        component="input"
-        type="number"
-        :error="errors.lat"
-        :disabled="loading"
-      />
-      <AppFormInput
-        label="Longtude: "
-        name="long"
-        component="input"
-        type="number"
-        :error="errors.long"
-        :disabled="loading"
-      />
+      <p>Drag the <Icon name="tabler:map-pin-filled" class="text-warning" /> marker to your desired location.</p>
+      <p>Or double click on the map.</p>
+      <p class="text-xs text-gray-400">
+        Current Location: {{ formatNumber(controlledValues.lat) }}, {{ formatNumber(controlledValues.long) }}
+      </p>
       <div class="flex justify-end gap-2">
         <button
           :disabled="loading"
