@@ -25,10 +25,23 @@ onMounted(() => {
       :coordinates="[point.long, point.lat]"
     >
       <template #marker>
-        <div class="tooltip tooltip-top" :data-tip="point.label">
-          <Icon name="tabler:map-pin-filled" size="30px" class="text-primary" />
+        <div class="tooltip tooltip-top" :class="{ 'tooltip-open': mapStore.selectedPointId === point.id }" :data-tip="point.name">
+          <Icon
+            name="tabler:map-pin-filled"
+            size="30px"
+            class="hover:text-primary hover:cursor-pointer"
+            :class="mapStore.selectedPointId === point.id ? 'text-primary' : 'text-secondary' "
+            @mouseenter="mapStore.selectedPointId = point.id;"
+            @mouseleave="mapStore.selectedPointId = null; "
+          />
         </div>
       </template>
+      <mgl-popup>
+        <h3>{{ point.name }}</h3>
+        <p v-if="point.description">
+          {{ point.description }}
+        </p>
+      </mgl-popup>
     </mgl-marker>
   </MglMap>
 </template>

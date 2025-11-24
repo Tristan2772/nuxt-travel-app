@@ -10,17 +10,12 @@ export const useLocationStore = defineStore("useLocationStore", () => {
     if (data.value) {
       sidebarStore.loading = false;
       sidebarStore.sidebarItems = data.value.map(location => ({
-        id: `location-${location.id}`,
+        id: location.id,
         label: location.name,
         icon: "tabler:map-pin-filled",
         href: "#",
       }));
-      mapStore.mapPoints = data.value.map(location => ({
-        id: location.id,
-        label: location.name,
-        lat: location.lat,
-        long: location.long,
-      }));
+      mapStore.mapPoints = data.value;
     }
     sidebarStore.loading = status.value === "pending";
   });
