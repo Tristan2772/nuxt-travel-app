@@ -56,8 +56,8 @@ function toggleSidebar() {
             :icon-color="mapStore.selectedPointId === item.id ? 'text-primary' : undefined"
             :href="item.href"
             :class="{ 'bg-base-300': mapStore.selectedPointId === item.id }"
-            @mouseenter="mapStore.selectedPointId = item.id; mapStore.selectedPointLat = mapStore.mapPoints[mapStore.mapPoints.findIndex(point => point.id === item.id)]?.lat; mapStore.selectedPointLong = mapStore.mapPoints[mapStore.mapPoints.findIndex(point => point.id === item.id)]?.long;"
-            @mouseleave="mapStore.selectedPointId = null; mapStore.selectedPointLat = undefined; mapStore.selectedPointLong = undefined"
+            @mouseenter="mapStore.selectedPointId = item.id;"
+            @mouseleave="mapStore.selectedPointId = null;"
           />
         </div>
         <div class="divider" />
@@ -70,8 +70,8 @@ function toggleSidebar() {
       </div>
     </div>
     <!-- ----------main content --------------- -->
-    <div class="flex-1 overflow-auto">
-      <div class="flex flex-col size-full">
+    <div class="flex-1 overflow-auto bg-base-200">
+      <div class="flex size-full" :class="{ 'flex-col': route.path !== '/dashboard/add' }">
         <NuxtPage />
         <AppMap class="flex-1" />
       </div>
