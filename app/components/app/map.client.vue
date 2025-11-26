@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { MglEvent } from "@indoorequal/vue-maplibre-gl";
-import type { LngLat } from "maplibre-gl";
+// import type { MglEvent } from "@indoorequal/vue-maplibre-gl";
+// import type { LngLat } from "maplibre-gl";
 
 import { CENTER_USA } from "~~/lib/constants";
 
@@ -9,20 +9,6 @@ const mapStore = useMapStore();
 
 const style = computed(() => colorMode.value === "dark" ? "/styles/dark.json" : "https://tiles.openfreemap.org/styles/liberty");
 const zoom = 3;
-
-function updateNewPoint(location: LngLat) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = location.lat;
-    mapStore.newPoint.long = location.lng;
-  }
-}
-
-function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = mglEvent.event.lngLat.lat;
-    mapStore.newPoint.long = mglEvent.event.lngLat.lng;
-  }
-}
 
 onMounted(() => {
   mapStore.init();
