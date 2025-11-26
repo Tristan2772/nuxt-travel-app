@@ -1,18 +1,63 @@
 <script lang="ts" setup>
+import type { NominatimResult } from "~~/lib/types";
 import type { FetchError } from "ofetch";
 
 import { toTypedSchema } from "@vee-validate/zod";
+import { CENTER_USA } from "~~/lib/constants";
 import { InsertLocation } from "~~/lib/db/schema";
 
 const { $csrfFetch } = useNuxtApp();
+
+const mapStore = useMapStore();
 
 const loading = ref(false);
 const router = useRouter();
 const submitError = ref("");
 const submitted = ref(false);
-
-const { handleSubmit, errors, meta, setErrors } = useForm({
+const { handleSubmit, errors, meta, setErrors, setFieldValue, controlledValues } = useForm({
   validationSchema: toTypedSchema(InsertLocation),
+  initialValues: {
+    name: "",
+    description: "",
+    long: (CENTER_USA as [number, number])[0],
+    lat: (CENTER_USA as [number, number])[1],
+  },
+});
+
+function formatNumber(value?: number) {
+  if (!value) {
+    return 0;
+  }
+  return value.toFixed(5);
+}
+
+function searchResultSelected(result: NominatimResult) {
+  setFieldValue("name", result.display_name);
+  mapStore.newPoint = {
+    id: 1,
+    name: "New Point",
+    description: "",
+    long: Number(result.lon),
+    lat: Number(result.lat),
+    centerMap: true,
+  };
+}
+
+effect(() => {
+  if (mapStore.newPoint) {
+    setFieldValue("long", mapStore.newPoint.long);
+    setFieldValue("lat", mapStore.newPoint.lat);
+  }
+});
+
+onMounted(() => {
+  mapStore.newPoint = {
+    id: 1,
+    name: "New Point",
+    description: "",
+    long: (CENTER_USA as [number, number])[0],
+    lat: (CENTER_USA as [number, number])[1],
+  };
 });
 
 const onSubmit = handleSubmit(async (values) => {
@@ -32,7 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
     if (error.data?.data) {
       setErrors(error.data?.data);
     }
-    submitError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred.";
+    submitError.value = getFetchErrorMessage(error);
   }
   loading.value = false;
 });
@@ -45,13 +90,14 @@ onBeforeRouteLeave(() => {
       return false;
     }
   }
+  mapStore.newPoint = null;
   return true;
 });
 </script>
 
 <template>
-  <div class="container max-w-md mx-auto ">
-    <div class="my-6 text-center">
+  <div class="container max-w-md mx-auto p-4 pb-10 overflow-y-auto">
+    <div class="my-6">
       <h1 class="text-lg">
         Add Location
       </h1>
@@ -92,22 +138,15 @@ onBeforeRouteLeave(() => {
         :error="errors.description"
         :disabled="loading"
       />
-      <AppFormInput
-        label="Latitude: "
-        name="lat"
-        component="input"
-        type="number"
-        :error="errors.lat"
-        :disabled="loading"
-      />
-      <AppFormInput
-        label="Longtude: "
-        name="long"
-        component="input"
-        type="number"
-        :error="errors.long"
-        :disabled="loading"
-      />
+      <p class="text-xs text-gray-400">
+        Current Coordinates: {{ formatNumber(controlledValues.lat) }}, {{ formatNumber(controlledValues.long) }}
+      </p>
+      <p>To set the Coordinates:</p>
+      <ul class="list-disc ml-4 text-sm">
+        <li>Drag the <Icon name="tabler:map-pin-filled" class="text-warning" /> marker.</li>
+        <li>Double click on the map.</li>
+        <li>Search for a location below.</li>
+      </ul>
       <div class="flex justify-end gap-2">
         <button
           :disabled="loading"
@@ -124,5 +163,7 @@ onBeforeRouteLeave(() => {
         </button>
       </div>
     </form>
+    <div class="divider" />
+    <AppPlaceSearch @result-selected="searchResultSelected" />
   </div>
 </template>
