@@ -17,8 +17,8 @@ async function onSubmit(query: Record<string, string>) {
   try {
     loading.value = true;
     hasSearched.value = true;
-    searchResults.value = [];
     errorMessage.value = "";
+    searchResults.value = [];
     const results = await $fetch("/api/search", {
       query,
     });
@@ -32,7 +32,7 @@ async function onSubmit(query: Record<string, string>) {
 }
 function setLocation(result: NominatimResult) {
   emit("resultSelected", result);
-  hasSearched.value = true;
+  hasSearched.value = false;
   searchResults.value = [];
   errorMessage.value = "";
   if (form.value) {
