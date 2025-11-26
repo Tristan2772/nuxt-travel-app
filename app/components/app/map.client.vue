@@ -8,21 +8,7 @@ const colorMode = useColorMode();
 const mapStore = useMapStore();
 
 const style = computed(() => colorMode.value === "dark" ? "/styles/dark.json" : "https://tiles.openfreemap.org/styles/liberty");
-const zoom = 6;
-
-function updateNewPoint(location: LngLat) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = location.lat;
-    mapStore.newPoint.long = location.lng;
-  }
-}
-
-function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = mglEvent.event.lngLat.lat;
-    mapStore.newPoint.long = mglEvent.event.lngLat.lng;
-  }
-}
+const zoom = 3;
 
 function updateNewPoint(location: LngLat) {
   if (mapStore.newPoint) {
@@ -56,7 +42,6 @@ onMounted(() => {
       v-if="mapStore.newPoint"
       :coordinates="[mapStore.newPoint.long, mapStore.newPoint.lat]"
       draggable
-      class-name="z-50"
       @update:coordinates="updateNewPoint"
     >
       <template #marker>
