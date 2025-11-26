@@ -24,6 +24,20 @@ function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
   }
 }
 
+function updateNewPoint(location: LngLat) {
+  if (mapStore.newPoint) {
+    mapStore.newPoint.lat = location.lat;
+    mapStore.newPoint.long = location.lng;
+  }
+}
+
+function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
+  if (mapStore.newPoint) {
+    mapStore.newPoint.lat = mglEvent.event.lngLat.lat;
+    mapStore.newPoint.long = mglEvent.event.lngLat.lng;
+  }
+}
+
 onMounted(() => {
   mapStore.init();
 });
