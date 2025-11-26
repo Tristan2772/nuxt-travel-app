@@ -48,7 +48,7 @@
     "drizzle-kit": "^0.31.7",
     "eslint-plugin-format": "^1.0.2",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.6"
+    "lint-staged": "^16.2.7"
   },
   "lint-staged": {
     "*": "npm run lint"
