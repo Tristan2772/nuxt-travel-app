@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { NominatimResult } from "~~/lib/types";
 import type { FetchError } from "ofetch";
 
 import { toTypedSchema } from "@vee-validate/zod";
@@ -28,6 +29,18 @@ function formatNumber(value?: number) {
     return 0;
   }
   return value.toFixed(5);
+}
+
+function searchResultSelected(result: NominatimResult) {
+  setFieldValue("name", result.display_name);
+  mapStore.newPoint = {
+    id: 1,
+    name: "New Point",
+    description: "",
+    long: Number(result.lon),
+    lat: Number(result.lat),
+    centerMap: true,
+  };
 }
 
 effect(() => {
@@ -64,7 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
     if (error.data?.data) {
       setErrors(error.data?.data);
     }
-    submitError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred.";
+    submitError.value = getFetchErrorMessage(error);
   }
   loading.value = false;
 });
@@ -83,8 +96,8 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
-  <div class="container max-w-md mx-auto p-4 ">
-    <div class="my-6 text-center">
+  <div class="container max-w-md mx-auto p-4 pb-10 overflow-y-auto">
+    <div class="my-6">
       <h1 class="text-lg">
         Add Location
       </h1>
@@ -125,11 +138,15 @@ onBeforeRouteLeave(() => {
         :error="errors.description"
         :disabled="loading"
       />
-      <p>Drag the <Icon name="tabler:map-pin-filled" class="text-warning" /> marker to your desired location.</p>
-      <p>Or double click on the map.</p>
       <p class="text-xs text-gray-400">
-        Current Location: {{ formatNumber(controlledValues.lat) }}, {{ formatNumber(controlledValues.long) }}
+        Current Coordinates: {{ formatNumber(controlledValues.lat) }}, {{ formatNumber(controlledValues.long) }}
       </p>
+      <p>To set the Coordinates:</p>
+      <ul class="list-disc ml-4 text-sm">
+        <li>Drag the <Icon name="tabler:map-pin-filled" class="text-warning" /> marker.</li>
+        <li>Double click on the map.</li>
+        <li>Search for a location below.</li>
+      </ul>
       <div class="flex justify-end gap-2">
         <button
           :disabled="loading"
@@ -146,5 +163,7 @@ onBeforeRouteLeave(() => {
         </button>
       </div>
     </form>
+    <div class="divider" />
+    <AppPlaceSearch @result-selected="searchResultSelected" />
   </div>
 </template>
