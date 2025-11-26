@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { MglEvent } from "@indoorequal/vue-maplibre-gl";
-import type { LngLat } from "maplibre-gl";
+// import type { MglEvent } from "@indoorequal/vue-maplibre-gl";
+// import type { LngLat } from "maplibre-gl";
 
 import { CENTER_USA } from "~~/lib/constants";
 
