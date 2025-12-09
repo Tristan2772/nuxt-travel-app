@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "nuxi typecheck"
   },
   "dependencies": {
     "@indoorequal/vue-maplibre-gl": "^8.4.2",
@@ -34,7 +35,6 @@
     "pinia": "^3.0.4",
     "slug": "^11.0.1",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
     "zod": "^4.1.12"
@@ -48,7 +48,9 @@
     "drizzle-kit": "^0.31.7",
     "eslint-plugin-format": "^1.0.2",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.6"
+    "lint-staged": "^16.2.6",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.1.6"
   },
   "lint-staged": {
     "*": "npm run lint"

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useSidebarStore } from "~/stores/sidebar";
+import { isPointSelected } from "~/utils/map-points";
 
 const isSidebarOpen = ref(true);
 const sidebarStore = useSidebarStore();
@@ -53,11 +54,11 @@ function toggleSidebar() {
             :show-label="isSidebarOpen"
             :label="item.label"
             :icon="item.icon"
-            :icon-color="mapStore.selectedPointId === item.id ? 'text-primary' : undefined"
-            :href="item.href"
-            :class="{ 'bg-base-300': mapStore.selectedPointId === item.id }"
-            @mouseenter="mapStore.selectedPointId = item.id;"
-            @mouseleave="mapStore.selectedPointId = null;"
+            :icon-color="isPointSelected(item.mapPoint, mapStore.selectedPoint) ? 'text-primary' : undefined"
+            :to="item.to"
+            :class="{ 'bg-base-300': isPointSelected(item.mapPoint, mapStore.selectedPoint) }"
+            @mouseenter="mapStore.selectedPoint = item.mapPoint ?? null;"
+            @mouseleave="mapStore.selectedPoint = null;"
           />
         </div>
         <div class="divider" />
