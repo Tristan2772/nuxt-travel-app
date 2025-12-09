@@ -1,3 +1,5 @@
+import type { RouteLocationRaw } from "vue-router";
+
 import type { UserWithID } from "./auth";
 import "h3";
 
@@ -17,6 +19,8 @@ export type MapPoint = {
   id: number;
   name: string;
   description: string | null;
+  to?: RouteLocationRaw;
+  toLabel?: string;
 } & LatLongItem;
 
 export type NominatimResult = {

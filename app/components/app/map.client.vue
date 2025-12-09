@@ -4,6 +4,8 @@ import type { LngLat } from "maplibre-gl";
 
 import { CENTER_USA } from "~~/lib/constants";
 
+import { isPointSelected } from "~/utils/map-points";
+
 const colorMode = useColorMode();
 const mapStore = useMapStore();
 
@@ -62,14 +64,14 @@ onMounted(() => {
       :coordinates="[point.long, point.lat]"
     >
       <template #marker>
-        <div class="tooltip tooltip-top" :class="{ 'tooltip-open': mapStore.selectedPointId === point.id }" :data-tip="point.name">
+        <div class="tooltip tooltip-top" :class="{ 'tooltip-open': isPointSelected(point, mapStore.selectedPoint) }" :data-tip="point.name">
           <Icon
             name="tabler:map-pin-filled"
             size="30px"
             class="hover:text-primary hover:cursor-pointer"
-            :class="mapStore.selectedPointId === point.id ? 'text-primary' : 'text-secondary' "
-            @mouseenter="mapStore.selectedPointId = point.id;"
-            @mouseleave="mapStore.selectedPointId = null; "
+            :class="isPointSelected(point, mapStore.selectedPoint) ? 'text-primary' : 'text-secondary' "
+            @mouseenter="mapStore.selectedPoint = point;"
+            @mouseleave="mapStore.selectedPoint = null; "
           />
         </div>
       </template>
@@ -80,6 +82,11 @@ onMounted(() => {
         <p v-if="point.description">
           {{ point.description }}
         </p>
+        <div class="flex justify-end mt-4">
+          <NuxtLink v-if="point.to" :to="point.to" class="btn btn-sm btn-outline">
+            {{ point.toLabel }}
+          </NuxtLink>
+        </div>
       </mgl-popup>
     </mgl-marker>
   </MglMap>

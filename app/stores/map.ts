@@ -3,7 +3,7 @@ import type { LngLatBounds } from "maplibre-gl";
 
 export const useMapStore = defineStore("useMapStore", () => {
   const mapPoints = ref<MapPoint[]>([]);
-  const selectedPointId = ref<number | null>(null);
+  const selectedPoint = ref<MapPoint | null>(null);
   const newPoint = ref<MapPoint & { centerMap?: boolean } | null>(null);
 
   async function init() {
@@ -13,6 +13,7 @@ export const useMapStore = defineStore("useMapStore", () => {
     const myMap = useMap();
 
     let bounds: LngLatBounds | null = null;
+    const padding = 60;
 
     effect(() => {
       const firstPoint = mapPoints.value[0];
@@ -26,7 +27,8 @@ export const useMapStore = defineStore("useMapStore", () => {
       ));
 
       myMap.map?.fitBounds(bounds, {
-        padding: 60,
+        padding,
+        maxZoom: 10,
       });
     });
 
@@ -34,7 +36,7 @@ export const useMapStore = defineStore("useMapStore", () => {
       if ((newValue && !oldValue) || newValue?.centerMap) {
         myMap.map?.flyTo({
           center: [newValue.long, newValue.lat],
-          speed: 2,
+          speed: 0.8,
           zoom: 6,
 
         });
@@ -47,6 +49,6 @@ export const useMapStore = defineStore("useMapStore", () => {
     init,
     mapPoints,
     newPoint,
-    selectedPointId,
+    selectedPoint,
   };
 });
