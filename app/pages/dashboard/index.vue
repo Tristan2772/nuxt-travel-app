@@ -2,11 +2,11 @@
 import { createMapPointFromLocation, isPointSelected } from "~/utils/map-points";
 
 const locationsStore = useLocationStore();
-const { locations, status } = storeToRefs(locationsStore);
+const { locations, locationsStatus: status } = storeToRefs(locationsStore);
 const mapStore = useMapStore();
 
 onMounted(() => {
-  locationsStore.refresh();
+  locationsStore.refreshLocations();
 });
 </script>
 
@@ -23,7 +23,16 @@ onMounted(() => {
         v-for="location in locations"
         :key="location.id"
         class="card card-compact mb-2 border-2 bg-base-300 h-40 w-72 shrink-0 hover:cursor-pointer"
-        :to="{ name: 'dashboard-location-slug', params: { slug: location.slug } }"
+        :to="{
+          name:
+            'dashboard-location-slug',
+          params:
+            {
+              slug:
+                location.slug,
+            },
+        }"
+
         :class="{
           'border-accent': isPointSelected(location, mapStore.selectedPoint),
           'border-transparent': !isPointSelected(location, mapStore.selectedPoint) }"
