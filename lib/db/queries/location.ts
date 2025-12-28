@@ -19,6 +19,7 @@ export async function findLocation(slug: string, userId: number) {
     },
   });
 }
+
 export async function findLocations(userId: number) {
   return db.query.location.findMany({
     where: eq(location.userId, userId),
@@ -41,24 +42,41 @@ export async function findLocationBySlug(slug: string) {
 }
 
 export async function findUniqueSlug(slug: string) {
-  let existingSlug = !!(await findLocationBySlug(slug));
+  let existing = !!(await findLocationBySlug(slug));
 
-  while (existingSlug) {
+  while (existing) {
     const id = nanoid();
-    const newSlug = `${slug}-${id}`;
-    existingSlug = !!(await findLocationBySlug(newSlug));
-    if (!existingSlug) {
-      return newSlug;
+    const idSlug = `${slug}-${id}`;
+    existing = !!(await findLocationBySlug(idSlug));
+    if (!existing) {
+      return idSlug;
     }
   }
+
   return slug;
 }
 
-export async function insertLocation(insertable: InsertLocation, slug: string, userId: number) {
+export async function insertLocation(
+  insertable: InsertLocation,
+  slug: string,
+  userId: number,
+) {
   const [created] = await db.insert(location).values({
     ...insertable,
     slug,
     userId,
   }).returning();
   return created;
+}
+
+export async function updateLocationBySlug(
+  updates: InsertLocation,
+  slug: string,
+  userId: number,
+) {
+  const [updated] = await db.update(location).set(updates).where(and(
+    eq(location.slug, slug),
+    eq(location.userId, userId),
+  )).returning();
+  return updated;
 }

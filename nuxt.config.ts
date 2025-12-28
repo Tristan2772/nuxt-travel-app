@@ -1,7 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-// cd documents/work/nuxt-travel-app npm run dev
-
 import tailwindcss from "@tailwindcss/vite";
 
 import "./lib/env";

@@ -1,12 +1,11 @@
 import type { RouteLocationRaw } from "vue-router";
 
-import type { UserWithID } from "./auth";
-import "h3";
+import type { UserWithId } from "./auth";
 
 declare module "h3" {
   // eslint-disable-next-line ts/consistent-type-definitions
   interface H3EventContext {
-    user?: UserWithID;
+    user?: UserWithId;
   }
 }
 

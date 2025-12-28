@@ -4,10 +4,10 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/plugins";
 
-import db from "./db/index"; // your drizzle instance
+import db from "./db/index";
 import env from "./env";
 
-export type UserWithID = Omit<User, "id"> & {
+export type UserWithId = Omit<User, "id"> & {
   id: number;
 };
 
@@ -33,9 +33,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     github: {
-      clientId: env.AUTH_GITHUB_CLIENT_ID!,
-      clientSecret: env.AUTH_GITHUB_CLIENT_SECRET!,
+      clientId: env.AUTH_GITHUB_CLIENT_ID,
+      clientSecret: env.AUTH_GITHUB_CLIENT_SECRET,
     },
   },
-
 });
