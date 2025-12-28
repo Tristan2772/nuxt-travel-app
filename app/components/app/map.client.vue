@@ -4,25 +4,26 @@ import type { LngLat } from "maplibre-gl";
 
 import { CENTER_USA } from "~~/lib/constants";
 
-import { isPointSelected } from "~/utils/map-points";
-
 const colorMode = useColorMode();
 const mapStore = useMapStore();
 
-const style = computed(() => colorMode.value === "dark" ? "/styles/dark.json" : "https://tiles.openfreemap.org/styles/liberty");
-const zoom = 6;
+const style = computed(() =>
+  colorMode.value === "dark"
+    ? "/styles/dark.json"
+    : "https://tiles.openfreemap.org/styles/liberty");
+const zoom = 3;
 
-function updateNewPoint(location: LngLat) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = location.lat;
-    mapStore.newPoint.long = location.lng;
+function updateAddedPoint(location: LngLat) {
+  if (mapStore.addedPoint) {
+    mapStore.addedPoint.lat = location.lat;
+    mapStore.addedPoint.long = location.lng;
   }
-}
+};
 
 function onDoubleClick(mglEvent: MglEvent<"dblclick">) {
-  if (mapStore.newPoint) {
-    mapStore.newPoint.lat = mglEvent.event.lngLat.lat;
-    mapStore.newPoint.long = mglEvent.event.lngLat.lng;
+  if (mapStore.addedPoint) {
+    mapStore.addedPoint.lat = mglEvent.event.lngLat.lat;
+    mapStore.addedPoint.long = mglEvent.event.lngLat.lng;
   }
 }
 
@@ -39,43 +40,49 @@ onMounted(() => {
     @map:dblclick="onDoubleClick"
   >
     <MglNavigationControl />
-
-    <mgl-marker
-      v-if="mapStore.newPoint"
-      :coordinates="[mapStore.newPoint.long, mapStore.newPoint.lat]"
+    <MglMarker
+      v-if="mapStore.addedPoint"
       draggable
       class-name="z-50"
-      @update:coordinates="updateNewPoint"
+      :coordinates="[mapStore.addedPoint.long, mapStore.addedPoint.lat]"
+      @update:coordinates="updateAddedPoint"
     >
       <template #marker>
-        <div class="tooltip tooltip-top tooltip-open" data-tip="Drag to desired location!">
+        <div
+          class="tooltip tooltip-top tooltip-open hover:cursor-pointer"
+          data-tip="Drag to your desired location"
+        >
           <Icon
             name="tabler:map-pin-filled"
-            size="30px"
-            class="text-warning hover:cursor-pointer"
+            size="35"
+            class="text-warning"
           />
         </div>
       </template>
-    </mgl-marker>
-
-    <mgl-marker
+    </MglMarker>
+    <MglMarker
       v-for="point in mapStore.mapPoints"
       :key="point.id"
       :coordinates="[point.long, point.lat]"
     >
       <template #marker>
-        <div class="tooltip tooltip-top" :class="{ 'tooltip-open': isPointSelected(point, mapStore.selectedPoint) }" :data-tip="point.name">
+        <div
+          class="tooltip tooltip-top hover:cursor-pointer"
+          :data-tip="point.name"
+          :class="{
+            'tooltip-open': isPointSelected(point, mapStore.selectedPoint),
+          }"
+          @mouseenter="mapStore.selectedPoint = point"
+          @mouseleave="mapStore.selectedPoint = null"
+        >
           <Icon
             name="tabler:map-pin-filled"
-            size="30px"
-            class="hover:text-primary hover:cursor-pointer"
-            :class="isPointSelected(point, mapStore.selectedPoint) ? 'text-primary' : 'text-secondary' "
-            @mouseenter="mapStore.selectedPoint = point;"
-            @mouseleave="mapStore.selectedPoint = null; "
+            size="30"
+            :class="isPointSelected(point, mapStore.selectedPoint) ? 'text-accent' : 'text-secondary'"
           />
         </div>
       </template>
-      <mgl-popup>
+      <MglPopup>
         <h3 class="text-xl">
           {{ point.name }}
         </h3>
@@ -83,11 +90,15 @@ onMounted(() => {
           {{ point.description }}
         </p>
         <div class="flex justify-end mt-4">
-          <NuxtLink v-if="point.to" :to="point.to" class="btn btn-sm btn-outline">
+          <NuxtLink
+            v-if="point.to"
+            :to="point.to"
+            class="btn btn-sm btn-outline"
+          >
             {{ point.toLabel }}
           </NuxtLink>
         </div>
-      </mgl-popup>
-    </mgl-marker>
+      </MglPopup>
+    </MglMarker>
   </MglMap>
 </template>

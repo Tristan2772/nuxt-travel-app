@@ -2,9 +2,8 @@
 const props = defineProps<{
   label: string;
   name: string;
-  component: string;
-  type?: "text" | "textarea" | "number";
   error?: string;
+  type?: "text" | "textarea";
   disabled?: boolean;
 }>();
 </script>
@@ -15,17 +14,18 @@ const props = defineProps<{
       {{ props.label }}
     </legend>
     <Field
-      :as="props.component"
+      :as="type || 'input'"
       :name="props.name"
-      :type="props.type"
+      :type="type || 'text'"
       :disabled="disabled"
       class="w-full"
       :class="{
-        'input': !props.type || props.type === 'text' || 'number',
-        'textarea': props.type === 'textarea',
-        'input-error': props.error }"
+        'input-error': props.error,
+        'input': !type || type === 'text',
+        'textarea': type === 'textarea',
+      }"
     />
-    <p v-if="props.error" class="label text-error">
+    <p v-if="props.error" class="fieldset-label text-error">
       {{ props.error }}
     </p>
   </fieldset>

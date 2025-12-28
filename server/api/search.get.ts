@@ -17,23 +17,24 @@ export default defineAuthenticatedEventHandler(
       const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${result.data.q}&format=json`, {
         signal: AbortSignal.timeout(5000),
         headers: {
-          "User-Agent": "nuxt-travel-app | tristancarter2772@gmail.com",
+          "User-Agent": "nuxt-travel-log | cj@null.computer",
         },
       });
 
       if (!response.ok) {
-        sendError(event, createError({
+        return sendError(event, createError({
           statusCode: 504,
-          statusMessage: "Unable to reach search API, please try again later.",
+          statusMessage: "Unable to reach search API.",
         }));
       }
+
       const results = await response.json() as NominatimResult[];
       return results;
     }
     catch {
-      sendError(event, createError({
+      return sendError(event, createError({
         statusCode: 504,
-        statusMessage: "Unable to reach search API, please try again later.",
+        statusMessage: "Unable to reach search API.",
       }));
     }
   }, {
