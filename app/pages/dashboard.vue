@@ -42,40 +42,43 @@ effect(() => {
   else if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || "")) {
     sidebarStore.sidebarTopItems = [{
       id: "link-dashboard",
-      label: currentLocationStatus.value === "pending" ? "Loading..." : "Go back",
+      label: "Go back",
       href: "/dashboard",
       icon: "tabler:arrow-left",
-    }, {
-      id: "link-location-slug",
-      label: currentLocation.value ? currentLocation.value.name : "View Logs",
-      to: {
-        name: "dashboard-location-slug",
-        params: {
-          slug: currentLocation.value?.slug ?? route.params.slug,
-        },
-      },
-      icon: "tabler:map",
-    }, {
-      id: "link-location-edit",
-      label: "Edit Location",
-      to: {
-        name: "dashboard-location-slug-edit",
-        params: {
-          slug: currentLocation.value?.slug ?? route.params.slug,
-        },
-      },
-      icon: "tabler:map-pin-cog",
-    }, {
-      id: "link-location-add",
-      label: "Add Location Log",
-      to: {
-        name: "dashboard-location-slug-add",
-        params: {
-          slug: currentLocation.value?.slug ?? route.params.slug,
-        },
-      },
-      icon: "tabler:plus",
     }];
+    if (currentLocation.value && currentLocationStatus.value !== "pending") {
+      sidebarStore.sidebarTopItems.push({
+        id: "link-location-slug",
+        label: currentLocation.value.name,
+        to: {
+          name: "dashboard-location-slug",
+          params: {
+            slug: route.params.slug,
+          },
+        },
+        icon: "tabler:map",
+      }, {
+        id: "link-location-edit",
+        label: "Edit Location",
+        to: {
+          name: "dashboard-location-slug-edit",
+          params: {
+            slug: currentLocation.value?.slug ?? route.params.slug,
+          },
+        },
+        icon: "tabler:map-pin-cog",
+      }, {
+        id: "link-location-add",
+        label: "Add Location Log",
+        to: {
+          name: "dashboard-location-slug-add",
+          params: {
+            slug: currentLocation.value?.slug ?? route.params.slug,
+          },
+        },
+        icon: "tabler:plus",
+      });
+    };
   }
 });
 
@@ -102,6 +105,9 @@ function toggleSidebar() {
           :href="topItem.href"
           :to="topItem.to"
         />
+        <div v-if="route.path.startsWith('/dashboard/location') && currentLocationStatus === 'pending'" class="flex items-center justify-center">
+          <div class="loading" />
+        </div>
         <div v-if="sidebarStore.loading || sidebarStore.sidebarItems.length" class="divider" />
         <div v-if="sidebarStore.loading" class="px-4">
           <div class="skeleton h-4 w-full" />
