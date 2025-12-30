@@ -5,6 +5,14 @@
     dark --prefersdark;
 }
 
+.page-content-top {
+  @apply p-4 min-h-72;
+}
+
+.location-list {
+  @apply flex flex-nowrap mt-4 gap-2 overflow-auto;
+}
+
 #__nuxt {
   .dark & .maplibregl-popup-content {
     @apply text-white bg-gray-800;
