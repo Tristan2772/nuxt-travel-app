@@ -1,8 +1,6 @@
 import type { SelectLocation, SelectLocationLog } from "~~/lib/db/schema";
 import type { MapPoint } from "~~/lib/types";
 
-const route = useRoute();
-
 export function createMapPointFromLocation(location: SelectLocation): MapPoint {
   return {
     ...location,
@@ -11,6 +9,7 @@ export function createMapPointFromLocation(location: SelectLocation): MapPoint {
   };
 }
 export function createMapPointFromLocationLog(locationLog: SelectLocationLog): MapPoint {
+  const route = useRoute();
   return {
     ...locationLog,
     to: { name: "dashboard-location-slug-id", params: { slug: route.params.slug, id: locationLog.id } },
