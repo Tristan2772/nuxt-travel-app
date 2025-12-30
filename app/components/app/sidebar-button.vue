@@ -18,7 +18,7 @@ const route = useRoute();
     <NuxtLink :to="props.href || props.to" :class="{ 'bg-base-200': route.path === props.href, 'justify-start': showLabel, 'justify-center': !showLabel }" class=" flex flex-nowrap items-center gap-2 p-2 hover:bg-base-300 hover:cursor-pointer">
       <Icon :name="props.icon" size="24px" :class="iconColor" />
       <Transition name="grow">
-        <span v-if="showLabel">
+        <span v-if="showLabel" class="truncate">
           {{ props.label }}
         </span>
       </Transition>
