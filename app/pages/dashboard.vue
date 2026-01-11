@@ -1,29 +1,24 @@
 <script lang="ts" setup>
 import { CURRENT_LOCATION_LOG_PAGES, CURRENT_LOCATION_PAGES, EDIT_PAGES, LOCATION_PAGES } from "~~/lib/constants";
 
-import { useSidebarStore } from "~/stores/sidebar";
-import { isPointSelected } from "~/utils/map-points";
-
 const isSidebarOpen = ref(true);
-const sidebarStore = useSidebarStore();
-
 const route = useRoute();
+const sidebarStore = useSidebarStore();
 const locationsStore = useLocationStore();
-
 const mapStore = useMapStore();
 
 const { currentLocation, currentLocationStatus } = storeToRefs(locationsStore);
 
 if (LOCATION_PAGES.has(route.name?.toString() || "")) {
-  await locationsStore.refreshLocations();
+  await locationsStore.refreshLocations;
 }
-
 if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || "") || CURRENT_LOCATION_LOG_PAGES.has(route.name?.toString() || "")) {
-  await locationsStore.refreshCurrentLocation();
+  await locationsStore.refreshCurrentLocation;
 }
 if (CURRENT_LOCATION_LOG_PAGES.has(route.name?.toString() || "")) {
-  await locationsStore.refreshCurrentLocationLog();
+  await locationsStore.refreshCurrentLocationLog;
 }
+
 onMounted(() => {
   isSidebarOpen.value = localStorage.getItem("isSidebarOpen") === "true";
 });
@@ -39,7 +34,7 @@ effect(() => {
       id: "link-location-add",
       label: "Add Location",
       href: "/dashboard/add",
-      icon: "tabler:plus",
+      icon: "tabler:circle-plus-filled",
     }];
   }
   else if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || "")) {
@@ -49,9 +44,10 @@ effect(() => {
       href: "/dashboard",
       icon: "tabler:arrow-left",
     }];
+
     if (currentLocation.value && currentLocationStatus.value !== "pending") {
       sidebarStore.sidebarTopItems.push({
-        id: "link-location-slug",
+        id: "link-location",
         label: currentLocation.value.name,
         to: {
           name: "dashboard-location-slug",
@@ -66,7 +62,7 @@ effect(() => {
         to: {
           name: "dashboard-location-slug-edit",
           params: {
-            slug: currentLocation.value?.slug ?? route.params.slug,
+            slug: route.params.slug,
           },
         },
         icon: "tabler:map-pin-cog",
@@ -76,18 +72,18 @@ effect(() => {
         to: {
           name: "dashboard-location-slug-add",
           params: {
-            slug: currentLocation.value?.slug ?? route.params.slug,
+            slug: route.params.slug,
           },
         },
-        icon: "tabler:plus",
+        icon: "tabler:circle-plus-filled",
       });
-    };
+    }
   }
   else if (CURRENT_LOCATION_LOG_PAGES.has(route.name?.toString() || "")) {
     if (currentLocation.value && currentLocationStatus.value !== "pending") {
       sidebarStore.sidebarTopItems = [{
         id: "link-location",
-        label: `Back to ${currentLocation.value.name}`,
+        label: `Back to "${currentLocation.value.name}"`,
         to: {
           name: "dashboard-location-slug",
           params: {
@@ -95,9 +91,31 @@ effect(() => {
           },
         },
         icon: "tabler:arrow-left",
+      }, {
+        id: "link-location-log",
+        label: "View Log",
+        to: {
+          name: "dashboard-location-slug-id",
+          params: {
+            slug: route.params.slug,
+            id: route.params.id,
+          },
+        },
+        icon: "tabler:map-pin",
+      }, {
+        id: "link-edit-location-log",
+        label: "Edit Log",
+        to: {
+          name: "dashboard-location-slug-id-edit",
+          params: {
+            slug: route.params.slug,
+            id: route.params.id,
+          },
+        },
+        icon: "tabler:map-pin-cog",
       }];
-    };
-  };
+    }
+  }
 });
 
 function toggleSidebar() {
@@ -107,21 +125,33 @@ function toggleSidebar() {
 </script>
 
 <template>
-  <div class="flex flex-1">
-    <div class="bg-base-100 transition-all duration-200 shrink-0" :class="{ 'w-64': isSidebarOpen, 'w-16': !isSidebarOpen }">
-      <div class="flex cursor-pointer hover:bg-base-200 p-2" :class="{ 'justify-end': isSidebarOpen, 'justify-center': !isSidebarOpen } " @click="toggleSidebar">
-        <Icon v-if="isSidebarOpen" name="tabler:chevron-left" size="32px" />
-        <Icon v-if="!isSidebarOpen" name="tabler:chevron-right" size="32px" />
+  <div class="flex-1 flex">
+    <div class="bg-base-100 transition-all duration-300 shrink-0" :class="{ 'w-64': isSidebarOpen, 'w-16': !isSidebarOpen }">
+      <div
+        class="flex hover:cursor-pointer hover:bg-base-200 p-2"
+        :class="{ 'justify-center': !isSidebarOpen, 'justify-end': isSidebarOpen }"
+        @click="toggleSidebar"
+      >
+        <Icon
+          v-if="isSidebarOpen"
+          name="tabler:chevron-left"
+          size="32"
+        />
+        <Icon
+          v-else
+          name="tabler:chevron-right"
+          size="32"
+        />
       </div>
       <div class="flex flex-col">
         <AppSidebarButton
-          v-for="topItem in sidebarStore.sidebarTopItems"
-          :key="topItem.id"
+          v-for="item in sidebarStore.sidebarTopItems"
+          :key="item.id"
           :show-label="isSidebarOpen"
-          :label="topItem.label"
-          :icon="topItem.icon"
-          :href="topItem.href"
-          :to="topItem.to"
+          :label="item.label"
+          :icon="item.icon"
+          :href="item.href"
+          :to="item.to"
         />
         <div v-if="route.path.startsWith('/dashboard/location') && currentLocationStatus === 'pending'" class="flex items-center justify-center">
           <div class="loading" />
@@ -137,11 +167,10 @@ function toggleSidebar() {
             :show-label="isSidebarOpen"
             :label="item.label"
             :icon="item.icon"
-            :icon-color="isPointSelected(item.mapPoint, mapStore.selectedPoint) ? 'text-primary' : undefined"
             :to="item.to"
-            :class="{ 'bg-base-300': isPointSelected(item.mapPoint, mapStore.selectedPoint) }"
-            @mouseenter="mapStore.selectedPoint = item.mapPoint ?? null;"
-            @mouseleave="mapStore.selectedPoint = null;"
+            :icon-color="isPointSelected(item.mapPoint, mapStore.selectedPoint) ? 'text-accent' : undefined"
+            @mouseenter="mapStore.selectedPoint = item.mapPoint ?? null"
+            @mouseleave="mapStore.selectedPoint = null"
           />
         </div>
         <div class="divider" />
@@ -153,7 +182,6 @@ function toggleSidebar() {
         />
       </div>
     </div>
-    <!-- ----------main content --------------- -->
     <div class="flex-1 overflow-auto bg-base-200">
       <div
         class="flex size-full"

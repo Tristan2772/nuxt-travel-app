@@ -12,8 +12,16 @@ const {
 const isOpen = ref(false);
 const deleteError = ref("");
 const isDeleting = ref(false);
+
 const loading = computed(() => status.value === "pending" || isDeleting.value);
 const errorMessage = computed(() => error.value?.statusMessage || deleteError.value);
+
+onMounted(() => {
+  setTimeout(
+    locationStore.refreshCurrentLocation,
+    0,
+  );
+});
 
 function openDialog() {
   isOpen.value = true;
@@ -37,15 +45,17 @@ async function confirmDelete() {
   isDeleting.value = false;
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    locationStore.refreshCurrentLocation();
-  }, 0);
-});
-
 onBeforeRouteUpdate((to) => {
   if (to.name === "dashboard-location-slug") {
-    locationStore.refreshCurrentLocation();
+    setTimeout(() => {
+      locationStore.refreshCurrentLocation();
+      navigateTo({
+        name: "dashboard-location-slug",
+        params: {
+          slug: route.params.slug,
+        },
+      });
+    }, 1);
   }
 });
 </script>
@@ -64,23 +74,29 @@ onBeforeRouteUpdate((to) => {
       <h2 class="text-xl">
         {{ location.name }}
         <div class="dropdown dropdown-bottom">
-          <div tabindex="0" role="button" class="btn m-1 btn-sm p-0">
+          <div
+            tabindex="0"
+            role="button"
+            class="btn m-1 btn-sm p-0"
+          >
             <Icon name="tabler:dots-vertical" size="20" />
           </div>
-          <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
             <li>
-              <NuxtLink to="" @click="openDialog">
-                <Icon name="tabler:trash-x-filled" size=" 20" />Delete
+              <NuxtLink @click="openDialog">
+                <Icon name="tabler:trash-x-filled" size="20" />
+                Delete
               </NuxtLink>
             </li>
             <li>
               <NuxtLink
-                :to="{ name: 'dashboard-location-slug-edit', params: { slug: route.params.slug } }"
+                :to="{
+                  name: 'dashboard-location-slug-edit',
+                  params: { slug: route.params.slug },
+                }"
               >
-                <Icon
-                  name="tabler:map-pin-cog"
-                  size=" 20"
-                />Edit
+                <Icon name="tabler:map-pin-cog" size="20" />
+                Edit
               </NuxtLink>
             </li>
           </ul>
@@ -93,35 +109,48 @@ onBeforeRouteUpdate((to) => {
         <p class="text-sm italic">
           Add a location log to get started.
         </p>
-        <NuxtLink class="btn btn-primary mt-2" :to="{ name: 'dashboard-location-slug-add', params: { slug: route.params.slug } }">
+        <NuxtLink
+          class="btn btn-primary mt-2"
+          :to="{
+            name: 'dashboard-location-slug-add',
+            params: { slug: route.params.slug },
+          }"
+        >
           Add Location Log
           <Icon name="tabler:map-pin-plus" size="24" />
         </NuxtLink>
       </div>
-      <div v-if="route.name === 'dashboard-location-slug' && location?.locationLogs.length && !loading" class="location-list">
-        <AppLocationCard v-for="log in location.locationLogs" :key="log.id" :map-point="createMapPointFromLocationLog(log)">
-          <template #top>
-            <p class="text-sm italic text-gray-500">
-              <span v-if="log.startedAt !== log.endedAt">
-                {{ formatDate(log.startedAt) }} / {{ formatDate(log.endedAt) }}
-              </span>
-              <span v-if="log.startedAt === log.endedAt">
-                {{ formatDate(log.startedAt) }}
-              </span>
-            </p>
-          </template>
-        </AppLocationCard>
-      </div>
+    </div>
+    <div
+      v-if="route.name === 'dashboard-location-slug' && !loading && location?.locationLogs.length"
+      class="location-list"
+    >
+      <AppLocationCard
+        v-for="log in location.locationLogs"
+        :key="log.id"
+        :map-point="createMapPointFromLocationLog(log)"
+      >
+        <template #top>
+          <p class="text-sm italic text-gray-500">
+            <span v-if="log.startedAt !== log.endedAt">
+              {{ formatDate(log.startedAt) }} / {{ formatDate(log.endedAt) }}
+            </span>
+            <span v-else>
+              {{ formatDate(log.startedAt) }}
+            </span>
+          </p>
+        </template>
+      </AppLocationCard>
     </div>
     <div v-if="route.name !== 'dashboard-location-slug'">
       <NuxtPage />
     </div>
     <AppDialog
-      :is-open="isOpen"
       title="Are you sure?"
-      description="Deleting this location will also delete all associated data. This cannot be undone. Do you really want to do this?"
+      description="Deleting this location will also delete all of the associated logs. This cannot be undone. Do you really want to do this?"
       confirm-label="Yes, delete this location!"
       confirm-class="btn-error"
+      :is-open="isOpen"
       @on-closed="isOpen = false"
       @on-confirmed="confirmDelete"
     />

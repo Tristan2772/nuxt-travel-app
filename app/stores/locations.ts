@@ -27,6 +27,7 @@ export const useLocationStore = defineStore("useLocationStore", () => {
     immediate: false,
     watch: false,
   });
+
   const {
     data: currentLocationLog,
     status: currentLocationLogStatus,

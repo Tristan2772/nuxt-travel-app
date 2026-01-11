@@ -6,13 +6,21 @@ const {
   currentLocationLogError: error,
   currentLocationLogStatus: status,
 } = storeToRefs(locationStore);
+
 const loading = computed(() => status.value === "pending");
 const errorMessage = computed(() => error.value?.statusMessage);
 
 onMounted(() => {
-  setTimeout(() => {
+  setTimeout(
+    locationStore.refreshCurrentLocationLog,
+    0,
+  );
+});
+
+onBeforeRouteUpdate((to) => {
+  if (to.name === "dashboard-location-slug-id") {
     locationStore.refreshCurrentLocationLog();
-  }, 0);
+  }
 });
 </script>
 
@@ -31,7 +39,7 @@ onMounted(() => {
         <span v-if="locationLog.startedAt !== locationLog.endedAt">
           {{ formatDate(locationLog.startedAt) }} / {{ formatDate(locationLog.endedAt) }}
         </span>
-        <span v-if="locationLog.startedAt === locationLog.endedAt">
+        <span v-else>
           {{ formatDate(locationLog.startedAt) }}
         </span>
       </p>
@@ -41,6 +49,9 @@ onMounted(() => {
       <p class="text-sm">
         {{ locationLog.description }}
       </p>
+    </div>
+    <div v-else>
+      <NuxtPage />
     </div>
   </div>
 </template>
