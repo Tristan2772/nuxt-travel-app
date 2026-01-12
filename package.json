@@ -14,6 +14,8 @@
     "typecheck": "nuxi typecheck"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.966.0",
+    "@aws-sdk/s3-presigned-post": "^3.966.0",
     "@indoorequal/vue-maplibre-gl": "^8.4.2",
     "@libsql/client": "^0.15.15",
     "@nuxt/eslint": "^1.10.0",

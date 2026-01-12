@@ -7,7 +7,7 @@ const sidebarStore = useSidebarStore();
 const locationsStore = useLocationStore();
 const mapStore = useMapStore();
 
-const { currentLocation, currentLocationStatus } = storeToRefs(locationsStore);
+const { currentLocation, currentLocationStatus, currentLocationLog } = storeToRefs(locationsStore);
 
 if (LOCATION_PAGES.has(route.name?.toString() || "")) {
   await locationsStore.refreshLocations;
@@ -93,7 +93,7 @@ effect(() => {
         icon: "tabler:arrow-left",
       }, {
         id: "link-location-log",
-        label: "View Log",
+        label: `View ${currentLocationLog.value?.name}`,
         to: {
           name: "dashboard-location-slug-id",
           params: {
@@ -113,6 +113,17 @@ effect(() => {
           },
         },
         icon: "tabler:map-pin-cog",
+      }, {
+        id: "link-location-log-images",
+        label: "Manage Images",
+        to: {
+          name: "dashboard-location-slug-id-images",
+          params: {
+            slug: route.params.slug,
+            id: route.params.id,
+          },
+        },
+        icon: "tabler:photo-cog",
       }];
     }
   }
