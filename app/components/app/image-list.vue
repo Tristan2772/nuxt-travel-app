@@ -13,6 +13,7 @@ const config = useRuntimeConfig();
     <div v-for="image in images" :key="image.id" class="card card-compact h-40 w-64 shrink-0 flex items-center justify-center">
       <div class="card-body size-full bg-base-300">
         <img class="size-full object-cover" :src="`${config.public.s3BucketUrl}/${image.key}`">
+        <slot :image />
       </div>
     </div>
   </div>
