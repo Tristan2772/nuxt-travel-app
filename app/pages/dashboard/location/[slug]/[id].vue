@@ -58,7 +58,7 @@ onBeforeRouteUpdate((to) => {
 </script>
 
 <template>
-  <div class="page-content-top">
+  <div>
     <div v-if="loading">
       <div class="loading" />
     </div>
