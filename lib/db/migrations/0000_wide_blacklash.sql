@@ -44,8 +44,8 @@ CREATE TABLE `verification` (
 	`identifier` text NOT NULL,
 	`value` text NOT NULL,
 	`expires_at` integer NOT NULL,
-	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL
+	`created_at` integer,
+	`updated_at` integer
 );
 --> statement-breakpoint
 CREATE TABLE `location` (
@@ -58,7 +58,7 @@ CREATE TABLE `location` (
 	`user_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `location_slug_unique` ON `location` (`slug`);--> statement-breakpoint
@@ -66,17 +66,17 @@ CREATE UNIQUE INDEX `location_name_userId_unique` ON `location` (`name`,`user_id
 CREATE TABLE `locationLog` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
+	`description` text,
 	`started_at` integer NOT NULL,
 	`ended_at` integer NOT NULL,
-	`description` text,
 	`lat` real NOT NULL,
 	`long` real NOT NULL,
-	`user_id` integer NOT NULL,
 	`location_id` integer NOT NULL,
+	`user_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `locationLogImg` (
@@ -86,6 +86,6 @@ CREATE TABLE `locationLogImg` (
 	`user_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	FOREIGN KEY (`location_log_id`) REFERENCES `locationLog`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`location_log_id`) REFERENCES `locationLog`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );

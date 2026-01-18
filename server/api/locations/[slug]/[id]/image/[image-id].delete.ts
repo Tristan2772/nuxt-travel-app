@@ -9,10 +9,10 @@ import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-
 export default defineAuthenticatedEventHandler(async (event) => {
   const imageId = getRouterParam(event, "image-id") as string;
   if (!z.coerce.number().safeParse(imageId).success) {
-    return sendError(event, createError({
+    throw createError({
       statusCode: 422,
       statusMessage: "Invalid image id.",
-    }));
+    });
   }
 
   const slug = getRouterParam(event, "slug") as string;
