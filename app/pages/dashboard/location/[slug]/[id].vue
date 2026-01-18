@@ -9,6 +9,10 @@ const {
   currentLocationLogStatus: status,
 } = storeToRefs(locationStore);
 
+function formatDateISO(value: number) {
+  return new Date(value).toISOString().split("T")[0];
+}
+
 const isOpen = ref(false);
 const deleteError = ref("");
 const isDeleting = ref(false);
@@ -70,10 +74,10 @@ onBeforeRouteUpdate((to) => {
     <div v-if="route.name === 'dashboard-location-slug-id' && locationLog && !loading">
       <p class="text-sm italic text-gray-500">
         <span v-if="locationLog.startedAt !== locationLog.endedAt">
-          {{ formatDate(locationLog.startedAt) }} / {{ formatDate(locationLog.endedAt) }}
+          {{ formatDateISO(locationLog.startedAt) }} / {{ formatDateISO(locationLog.endedAt) }}
         </span>
         <span v-else>
-          {{ formatDate(locationLog.startedAt) }}
+          {{ formatDateISO(locationLog.startedAt) }}
         </span>
       </p>
       <h2 class="text-xl">

@@ -16,6 +16,10 @@ const isDeleting = ref(false);
 const loading = computed(() => status.value === "pending" || isDeleting.value);
 const errorMessage = computed(() => error.value?.statusMessage || deleteError.value);
 
+function formatDateISO(value: number) {
+  return new Date(value).toISOString().split("T")[0];
+}
+
 onMounted(() => {
   setTimeout(
     locationStore.refreshCurrentLocation,
@@ -133,10 +137,10 @@ onBeforeRouteUpdate((to) => {
         <template #top>
           <p class="text-sm italic text-gray-500">
             <span v-if="log.startedAt !== log.endedAt">
-              {{ formatDate(log.startedAt) }} / {{ formatDate(log.endedAt) }}
+              {{ formatDateISO(log.startedAt) }} / {{ formatDateISO(log.endedAt) }}
             </span>
             <span v-else>
-              {{ formatDate(log.startedAt) }}
+              {{ formatDateISO(log.startedAt) }}
             </span>
           </p>
         </template>

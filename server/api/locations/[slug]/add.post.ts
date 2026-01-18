@@ -11,10 +11,10 @@ export default defineAuthenticatedEventHandler(async (event) => {
   const result = await readValidatedBody(event, InsertLocationLog.safeParse);
 
   if (!location) {
-    return sendError(event, createError({
+    throw createError({
       statusCode: 404,
       statusMessage: "Location not found.",
-    }));
+    });
   }
 
   if (!result.success) {

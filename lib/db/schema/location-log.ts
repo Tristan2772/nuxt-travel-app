@@ -1,12 +1,12 @@
 import type z from "zod";
 
-import { DescriptionSchema, LatSchema, LongSchema, NameSchema } from "~~/lib/zod-schemas";
 import { relations } from "drizzle-orm";
 import { int, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 
 import type { SelectLocationLogImage } from "./location-log-img";
 
+import { DescriptionSchema, LatSchema, LongSchema, NameSchema } from "../../zod-schemas";
 import { user } from "./auth";
 import { location } from "./location";
 import { locationLogImg } from "./location-log-img";
@@ -19,8 +19,8 @@ export const locationLog = sqliteTable("locationLog", {
   endedAt: int().notNull(),
   lat: real().notNull(),
   long: real().notNull(),
-  locationId: int().notNull().references(() => location.id),
-  userId: int().notNull().references(() => user.id),
+  locationId: int().notNull().references(() => location.id, { onDelete: "cascade" }),
+  userId: int().notNull().references(() => user.id, { onDelete: "cascade" }),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 });
