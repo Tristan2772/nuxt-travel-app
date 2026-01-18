@@ -28,12 +28,13 @@ export const locationRelations = relations(location, ({ many }) => ({
   locationLogs: many(locationLog),
 }));
 
-export const InsertLocation = createInsertSchema(location, {
+const BaseInsertLocation = createInsertSchema(location, {
   name: NameSchema,
   description: DescriptionSchema,
   lat: LatSchema,
   long: LongSchema,
-}).omit({
+});
+export const InsertLocation = BaseInsertLocation.omit({
   id: true,
   slug: true,
   userId: true,
