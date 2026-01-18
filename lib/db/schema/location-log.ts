@@ -33,18 +33,22 @@ export const locationLogRelations = relations(locationLog, ({ one, many }) => ({
   images: many(locationLogImg),
 }));
 
-export const InsertLocationLog = createInsertSchema(locationLog, {
+const BaseInsertLocationLog = createInsertSchema(locationLog, {
   name: NameSchema,
   description: DescriptionSchema,
   lat: LatSchema,
   long: LongSchema,
-}).omit({
+});
+
+const UnrefinedInsertLocationLog = BaseInsertLocationLog.omit({
   id: true,
   userId: true,
   locationId: true,
   createdAt: true,
   updatedAt: true,
-}).superRefine((values, context) => {
+});
+
+export const InsertLocationLog = UnrefinedInsertLocationLog.superRefine((values, context) => {
   if (values.startedAt > values.endedAt || values.endedAt < values.startedAt) {
     context.addIssue({
       code: "custom",

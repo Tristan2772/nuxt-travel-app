@@ -24,9 +24,10 @@ export const locationLogImageRelations = relations(locationLogImg, ({ one, many 
   image: many(locationLogImg),
 }));
 
-export const InsertLocationLogImage = createInsertSchema(locationLogImg, {
+const BaseInsertLocationLogImage = createInsertSchema(locationLogImg, {
   key: field => field.regex(/^\d+\/\d+\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\.jpg$/, "Invalid Key"),
-}).omit({
+});
+export const InsertLocationLogImage = BaseInsertLocationLogImage.omit({
   id: true,
   locationLogId: true,
   userId: true,
